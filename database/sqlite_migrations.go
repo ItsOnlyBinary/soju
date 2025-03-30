@@ -198,4 +198,5 @@ var sqliteMigrations = []string{
 		CREATE INDEX Message_target_index ON Message(target);
 		CREATE INDEX MessageTarget_network_index ON MessageTarget(network);
 	`,
+	"ALTER TABLE Network ADD COLUMN rate_limit INTEGER NOT NULL DEFAULT 1;",
 }

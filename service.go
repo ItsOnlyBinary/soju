@@ -223,7 +223,7 @@ func init() {
 		"network": {
 			children: serviceCommandSet{
 				"create": {
-					usage:  "-addr <addr> [-name name] [-username username] [-pass pass] [-realname realname] [-certfp fingerprint] [-nick nick] [-auto-away auto-away] [-enabled enabled] [-ignore-limit ignore-limit] [-connect-command command]...",
+					usage:  "-addr <addr> [-name name] [-username username] [-pass pass] [-realname realname] [-certfp fingerprint] [-nick nick] [-auto-away auto-away] [-rate-limit rate-limit] [-enabled enabled] [-ignore-limit ignore-limit] [-connect-command command]...",
 					desc:   "add a new network",
 					handle: handleServiceNetworkCreate,
 				},
@@ -232,7 +232,7 @@ func init() {
 					handle: handleServiceNetworkStatus,
 				},
 				"update": {
-					usage:  "[name] [-addr addr] [-name name] [-username username] [-pass pass] [-realname realname] [-certfp fingerprint] [-nick nick] [-auto-away auto-away] [-enabled enabled] [-ignore-limit ignore-limit] [-connect-command command]...",
+					usage:  "[name] [-addr addr] [-name name] [-username username] [-pass pass] [-realname realname] [-certfp fingerprint] [-nick nick] [-auto-away auto-away] [-rate-limit rate-limit] [-enabled enabled] [-ignore-limit ignore-limit] [-connect-command command]...",
 					desc:   "update a network",
 					handle: handleServiceNetworkUpdate,
 				},
@@ -514,7 +514,7 @@ func getNetworkFromArg(ctx *serviceContext, params []string) (*network, []string
 type networkFlagSet struct {
 	*flag.FlagSet
 	Addr, Name, Nick, Username, Pass, Realname, CertFP *string
-	AutoAway, Enabled                                  *bool
+	AutoAway, RateLimit, Enabled                       *bool
 	IgnoreLimit                                        bool
 	ConnectCommands                                    []string
 }
@@ -529,6 +529,7 @@ func newNetworkFlagSet() *networkFlagSet {
 	fs.Var(stringPtrFlag{&fs.Realname}, "realname", "")
 	fs.Var(stringPtrFlag{&fs.CertFP}, "certfp", "")
 	fs.Var(boolPtrFlag{&fs.AutoAway}, "auto-away", "")
+	fs.Var(boolPtrFlag{&fs.RateLimit}, "rate-limit", "")
 	fs.Var(boolPtrFlag{&fs.Enabled}, "enabled", "")
 	fs.BoolVar(&fs.IgnoreLimit, "ignore-limit", false, "")
 	fs.Var((*stringSliceFlag)(&fs.ConnectCommands), "connect-command", "")
@@ -582,6 +583,9 @@ func (fs *networkFlagSet) update(network *database.Network) error {
 	}
 	if fs.AutoAway != nil {
 		network.AutoAway = *fs.AutoAway
+	}
+	if fs.RateLimit != nil {
+		network.RateLimit = *fs.RateLimit
 	}
 	if fs.Enabled != nil {
 		network.Enabled = *fs.Enabled

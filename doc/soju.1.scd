@@ -330,6 +330,11 @@ character.
 		user will be marked as away when all clients are disconnected from the
 		bouncer. By default, auto-away is enabled.
 
+	*-rate-limit* true|false
+		Enable or disable the rate-limit feature. If the feature is enabled, the
+		upstream connection will be rate limited to prevent disconnects.
+		By default, rate-limit is enabled.
+
 	*-enabled* true|false
 		Enable or disable the network. If the network is disabled, the bouncer
 		won't connect to it. By default, the network is enabled.

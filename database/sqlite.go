@@ -379,7 +379,7 @@ func (db *SqliteDB) ListNetworks(ctx context.Context, userID int64) ([]Network, 
 	rows, err := db.db.QueryContext(ctx, `
 		SELECT id, name, addr, nick, username, realname, certfp, pass,
 			connect_commands, sasl_mechanism, sasl_plain_username, sasl_plain_password,
-			sasl_external_cert, sasl_external_key, auto_away, enabled
+			sasl_external_cert, sasl_external_key, auto_away, rate_limit, enabled
 		FROM Network
 		WHERE user = ?`,
 		userID)
@@ -395,7 +395,7 @@ func (db *SqliteDB) ListNetworks(ctx context.Context, userID int64) ([]Network, 
 		var saslMechanism, saslPlainUsername, saslPlainPassword sql.NullString
 		err := rows.Scan(&net.ID, &name, &net.Addr, &nick, &username, &realname, &certfp,
 			&pass, &connectCommands, &saslMechanism, &saslPlainUsername, &saslPlainPassword,
-			&net.SASL.External.CertBlob, &net.SASL.External.PrivKeyBlob, &net.AutoAway, &net.Enabled)
+			&net.SASL.External.CertBlob, &net.SASL.External.PrivKeyBlob, &net.AutoAway, &net.RateLimit, &net.Enabled)
 		if err != nil {
 			return nil, err
 		}
@@ -455,6 +455,7 @@ func (db *SqliteDB) StoreNetwork(ctx context.Context, userID int64, network *Net
 		sql.Named("sasl_external_cert", network.SASL.External.CertBlob),
 		sql.Named("sasl_external_key", network.SASL.External.PrivKeyBlob),
 		sql.Named("auto_away", network.AutoAway),
+		sql.Named("rate_limit", network.RateLimit),
 		sql.Named("enabled", network.Enabled),
 
 		sql.Named("id", network.ID), // only for UPDATE
@@ -469,17 +470,17 @@ func (db *SqliteDB) StoreNetwork(ctx context.Context, userID int64, network *Net
 				realname = :realname, certfp = :certfp, pass = :pass, connect_commands = :connect_commands,
 				sasl_mechanism = :sasl_mechanism, sasl_plain_username = :sasl_plain_username, sasl_plain_password = :sasl_plain_password,
 				sasl_external_cert = :sasl_external_cert, sasl_external_key = :sasl_external_key,
-				auto_away = :auto_away, enabled = :enabled
+				auto_away = :auto_away, rate_limit = :rate_limit, enabled = :enabled
 			WHERE id = :id`, args...)
 	} else {
 		var res sql.Result
 		res, err = db.db.ExecContext(ctx, `
 			INSERT INTO Network(user, name, addr, nick, username, realname, certfp, pass,
 				connect_commands, sasl_mechanism, sasl_plain_username,
-				sasl_plain_password, sasl_external_cert, sasl_external_key, auto_away, enabled)
+				sasl_plain_password, sasl_external_cert, sasl_external_key, auto_away, rate_limit, enabled)
 			VALUES (:user, :name, :addr, :nick, :username, :realname, :certfp, :pass,
 				:connect_commands, :sasl_mechanism, :sasl_plain_username,
-				:sasl_plain_password, :sasl_external_cert, :sasl_external_key, :auto_away, :enabled)`,
+				:sasl_plain_password, :sasl_external_cert, :sasl_external_key, :auto_away, rate_limit, :enabled)`,
 			args...)
 		if err != nil {
 			return err

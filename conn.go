@@ -111,6 +111,7 @@ func (wa websocketAddr) String() string {
 
 type connOptions struct {
 	Logger         Logger
+	RateLimit      bool
 	RateLimitDelay time.Duration
 	RateLimitBurst int
 }
@@ -134,7 +135,7 @@ func newConn(srv *Server, ic ircConn, options *connOptions) *conn {
 		logger:     options.Logger,
 		outgoingCh: outgoingCh,
 		closedCh:   make(chan struct{}),
-		rateLimit:  true,
+		rateLimit:  options.RateLimit,
 	}
 
 	go func() {

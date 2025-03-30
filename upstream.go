@@ -347,6 +347,7 @@ func connectToUpstream(ctx context.Context, network *network) (*upstreamConn, er
 
 	options := connOptions{
 		Logger:         logger,
+		RateLimit:      network.RateLimit,
 		RateLimitDelay: upstreamMessageDelay,
 		RateLimitBurst: upstreamMessageBurst,
 	}

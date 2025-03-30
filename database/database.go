@@ -168,14 +168,16 @@ type Network struct {
 	CertFP          string
 	SASL            SASL
 	AutoAway        bool
+	RateLimit       bool
 	Enabled         bool
 }
 
 func NewNetwork(addr string) *Network {
 	return &Network{
-		Addr:     addr,
-		AutoAway: true,
-		Enabled:  true,
+		Addr:      addr,
+		AutoAway:  true,
+		RateLimit: true,
+		Enabled:   true,
 	}
 }
 
